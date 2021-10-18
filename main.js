@@ -1,27 +1,35 @@
 const fetch = require("node-fetch");
 const cheerio = require("cheerio");
-const bodyParser = require("body-parser");
 const express = require("express");
-const { request } = require("http");
 const app = express();
 const PORT = 8000;
 var url = "https://www.dictionary.com/browse/";
 var words = ""; 
 
-app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: false}));
 
-app.use(bodyParser.urlencoded({
-    extended : true
-}));
+app.use(express.static('public'));
+
+app.set('view-engine', 'ejs');
 
 app.get("/", function(req, res){
-    res.sendFile(__dirname + '/' + 'index.html');
+    res.render('index.ejs');
 });
 
 app.post("/", function(req, res){
+
+    url = "https://www.dictionary.com/browse/"
     words = req.body.word;
     url = url + words;
-    getData(url);
+
+    // promise based function to render to ejs
+    const printJSON = async (url) => {
+
+        var data = await getData(url);
+        res.render('result.ejs', {word : data.word, pronunciation: data.pronunciation, meaning: data.meaning});
+    };
+
+    data = printJSON(url);
 });
 
 // function to get the raw data
@@ -34,24 +42,32 @@ const getRawData = (URL) => {
         });
 };
 
-// start of the program
 const getData = async (url) => {
    
+    // collecting raw data
     const rawData = await getRawData(url);
-    // console.log(rawData);
 
     // parsing the data
     const parsedData = cheerio.load(rawData);
-    // console.log(parsedData);
 
-    const word = parsedData("h1.css-1sprl0b");
-    // console.log(word[0].children[0].data);
+    var word = parsedData("h1.css-1sprl0b");
+    word = (word[0].children[0].data);
 
-    const pronunciation = parsedData("span.pron-spell-content");
-    // console.log(pronunciation[0].children[0].data);
+    var pronunciation = parsedData("span.pron-spell-content");
+    pronunciation = (pronunciation[0].children[0].data);
 
-    const meaning = parsedData("span.one-click-content");
-    // console.log(meaning[0].children[0].data);
+    var meaning = parsedData("span.one-click-content");
+    meaning = (meaning[0].children[0].data);
+
+    // JSON for word info
+    var data = {
+
+        "word" : word,
+        "pronunciation" : pronunciation,
+        "meaning" : meaning
+    }
+
+    return data;
 };
 
 app.listen(PORT, function(){
