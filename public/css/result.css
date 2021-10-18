@@ -1,0 +1,36 @@
+body {
+
+    margin: 0%;
+    background-color: #F2F2F2;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.container {
+
+    background-color: #ffffff;
+    height: auto;
+    margin: auto;
+    margin-top: 5%;
+    width: 60%;
+    padding: 1% 5%;
+}
+
+.word h1, h2, p{
+
+    margin: 2.5% 2%;
+}
+
+.word h1 {
+
+    font-size: 8vh;
+}
+
+.word h2 {
+
+    font-size: 4vh;
+}
+p {
+
+    color: #FE2F2F;
+    font-size: 2.5vh;
+}
