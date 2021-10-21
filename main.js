@@ -4,6 +4,7 @@ const express = require("express");
 const app = express();
 const PORT = 8000;
 var url = "https://www.dictionary.com/browse/";
+var synonymUrl = "https://www.synonyms.com/synonym/";
 var words = ""; 
 
 app.use(express.urlencoded({ extended: false}));
@@ -22,11 +23,14 @@ app.post("/", function(req, res){
     words = req.body.word;
     url = url + words;
 
+    synonymUrl = "https://www.synonyms.com/synonym/"
+    synonymUrl = synonymUrl + words;
+
     // promise based function to render to ejs
     const printJSON = async (url) => {
 
         var data = await getData(url);
-        res.render('result.ejs', {word : data.word, pronunciation: data.pronunciation, meaning: data.meaning});
+        res.render('result.ejs', {word : data.word, pronunciation: data.pronunciation, meaningOne: data.meaningOne, meaningTwo: data.meaningTwo, meaningThree: data.meaningThree, synonymLink: synonymUrl});
     };
 
     data = printJSON(url);
@@ -57,14 +61,18 @@ const getData = async (url) => {
     pronunciation = (pronunciation[0].children[0].data);
 
     var meaning = parsedData("span.one-click-content");
-    meaning = (meaning[0].children[0].data);
+    meaningOne = (meaning[0].children[0].data);
+    meaningTwo = (meaning[1].children[0].data);
+    meaningThree = (meaning[2].children[0].data);  
 
     // JSON for word info
     var data = {
 
         "word" : word,
         "pronunciation" : pronunciation,
-        "meaning" : meaning
+        "meaningOne" : meaningOne,
+        "meaningTwo" : meaningTwo,
+        "meaningThree" : meaningThree
     }
 
     return data;
